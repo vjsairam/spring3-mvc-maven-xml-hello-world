@@ -1,0 +1,452 @@
+  <html>
+    <head>
+      <title>${project.name}</title>
+      <style>
+        body table, td, th, p, h1, h2 {
+        margin:0;
+        font:normal normal
+        100% Georgia, Serif;
+        background-color: #ffffff;
+        }
+        h1, h2 {
+       <!-- border-bottom:dotted 1px #999999;-->
+        padding:5px;
+        margin-top:10px;
+        margin-bottom:10px;
+        color: #000000;
+        font: normal bold 130%
+        Georgia,Serif;
+        background-color:#f0f0f0;
+        }
+        tr.gray {
+        background-color:#f0f0f0;
+        }
+        h2 {
+        padding:5px;
+        margin-top:5px;
+        margin-bottom:5px;
+        font: italic bold 110% Georgia,Serif;
+        }
+        .bg2 {
+        color:black;
+        background-color:#E0E0E0;
+        font-size:110%
+        }
+        th {
+        font-weight: bold;
+        }
+        tr, td, th {
+        padding:2px;
+        }
+        td.test_passed {
+        color:blue;
+        }
+        td.test_failed {
+        color:red;
+        }
+        td.center {
+          text-align: center;
+        }
+        td.test_skipped {
+        color:grey;
+        }
+        .console {
+        font: normal normal 90% Courier New,
+        monotype;
+        padding:0px;
+        margin:0px;
+        }
+        div.content, div.header {
+        background: #ffffff;
+        border: dotted
+        1px #666;
+        margin: 2px;
+        content:
+        2px;
+        padding: 2px;
+        }
+        table.border, th.border, td.border {
+        border: 1px solid black;
+        border-collapse:collapse;
+        }
+      </style>
+    </head>
+    <body>
+        <!-- HEADER -->
+        <div class="header">
+        <table class="border">
+        <tr class="gray">
+                <td width="95%" style='width:99.0%;border:solid black 0pt;background:lightgrey;padding:0pt'>
+                        <b style='background: lightgrey;line-height:115%'>
+                        <span style='font-size:36.0pt;line-height:115%;color:black'>Jenkins Enterprise Build Notification</span>
+                        </b>
+                </td>
+                <td style='border:solid black 0pt;border-left:none;padding:0pt'>
+                        <p style='line-height:115%'>
+                        <span style='mso-no-proof:yes'>
+                        <img src="${rooturl}static/e59dfe28/images/WellsFargo_Logo.jpg" />
+                        </span>
+                        </p>
+                </td>
+         </tr>
+        </table>
+</div>
+<br />
+        <!-- GENERAL INFO -->
+      <div class="content">
+        <set var="spc" value="&amp;nbsp;&amp;nbsp;" />
+		 <h1>Build Summary</h1>
+        <table>
+          <tr class="gray">
+            <td align="right">
+              <choose>
+                <when test="${build.result=='SUCCESS'}">
+                  <img src="${rooturl}static/e59dfe28/images/32x32/blue.gif" />
+                </when>
+                <when test="${build.result=='FAILURE'}">
+                  <img src="${rooturl}static/e59dfe28/images/32x32/red.gif" />
+                </when>
+                <when test="${build.result=='ABORTED'}">
+                  <img src="${rooturl}static/e59dfe28/images/32x32/grey.gif" />
+                </when>
+                <otherwise>
+                  <img
+                    src="${rooturl}static/e59dfe28/images/32x32/yellow.gif" />
+                </otherwise>
+              </choose>
+            </td>
+            <td valign="center">
+              <b style="font-size: 200%;">BUILD ${build.result}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>Build URL</td>
+            <td>
+              <a href="${rooturl}${build.url}">${rooturl}${build.url}</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Project:</td>
+            <td>${project.name}</td>
+          </tr>
+	      <tr>
+            <td>Build ID:</td>
+            <td>${build.number}</td>
+          </tr>
+		  <tr>
+            <td>Build Tag:</td>
+            <td>${build.tag}</td>
+          </tr>
+          <tr>
+            <td>Date of build:</td>
+            <td>${it.timestampString}</td>
+          </tr>
+          <tr>
+            <td>Build duration:</td>
+            <td>${build.durationString}</td>
+          </tr>
+          <tr>
+            <td>Build cause:</td>
+            <td>
+              <forEach var="cause" items="${build.causes}">${cause.shortDescription}
+              </forEach>
+            </td>
+          </tr>
+          <tr>
+            <td>Build description:</td>
+            <td>${build.description}</td>
+          </tr>
+          <tr>
+            <td>Built on:</td>
+            <td>
+              <choose>
+                <when test="${build.builtOnStr!=''}">${build.builtOnStr}</when>
+                <otherwise>master</otherwise>
+              </choose>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- HEALTH TEMPLATE -->
+      <div class="content">
+        <set var="healthIconSize" value="16x16" />
+        <set var="healthReports" value="${project.buildHealthReports}" />
+        <if test="${healthReports!=null}">
+          <h1>Health Report</h1>
+          <table>
+            <tr>
+              <th>Weather</th>
+              <th>Description</th>
+              <th>Score</th>
+            </tr>
+            <forEach var="healthReport" items="${healthReports}">
+              <tr>
+                <td>
+                  <img
+                    src="${rooturl}${healthReport.getIconUrl(healthIconSize)}" />
+                </td>
+                <td>${healthReport.description}</td>
+                <td>${healthReport.score}</td>
+              </tr>
+            </forEach>
+          </table>
+          <br />
+        </if>
+      </div>
+
+      <!-- CHANGE SET -->
+        <set var="changeSet" value="${build.changeSet}" />
+        <if test="${changeSet!=null}">
+        <set var="hadChanges" value="false" />
+        <div class="content">
+            <h1>Changes</h1>
+        <table>
+             <tr>
+               <th class="border">Commit ID</th>
+               <th class="border">Author</th>
+               <th class="border">Commit Date</th>
+               <th class="border">Commit Message</th>
+               <th class="border">Fileset</th>
+               <th class="border">Action</th>
+             </tr>
+            <forEach var="cs" items="${changeSet.logs}" varStatus="loop">
+            <set var="hadChanges" value="true" />
+            <forEach var="p" items="${cs.affectedFiles}">
+                <tr>
+                   <td class="border">${cs.commitId}</td>
+                   <td class="border">${cs.author}</td>
+                   <td class="border">${cs.date}</td>
+                   <td class="border">${cs.comment}</td>
+                   <td class="border">${p.path}</td>
+                   <td class="border">${p.editType.name}</td>
+                </tr>
+             </forEach>
+             </forEach>
+        </table>
+          <if test="${!hadChanges}">
+            <p>No Changes</p>
+          </if>
+        </div>
+        </if>
+      <!-- ARTIFACTS -->
+      <set var="artifacts" value="${build.artifacts}" />
+      <if test="${artifacts!=null and artifacts.size()&gt;0}">
+        <div class="content">
+          <h1>Build Artifacts</h1>
+          <ul>
+            <forEach var="f" items="${artifacts}">
+              <li>
+              <!--  <a href="${rooturl}${build.url}artifact/${f}">${f}</a> -->
+			   <p>${f}</p>
+              </li>
+            </forEach>
+          </ul>
+        </div>
+      </if>
+
+      <!-- MAVEN ARTIFACTS -->
+      <set var="mbuilds" value="${build.moduleBuilds}" />
+      <if test="${mbuilds!=null}">
+        <div class="content">
+          <h1>Build Artifacts</h1>
+          <forEach var="m" items="${mbuilds}">
+            <p>${m.key.displayName}</p>
+            <forEach var="mvnbld" items="${m.value}">
+              <set var="artifacts" value="${mvnbld.artifacts}" />
+              <if test="${artifacts!=null and artifacts.size()&gt;0}">
+               <ul>
+                  <forEach var="f" items="${artifacts}">
+                   <!--   <a href="${rooturl}${mvnbld.url}artifact/${f}">${f}</a> -->
+                <li>
+                <p>${f}</p>
+                </li>
+                  </forEach>
+               </ul>
+              </if>
+            </forEach>
+          </forEach>
+<!--          <br /> -->
+        </div>
+      </if>
+      <!-- JUnit TEMPLATE -->
+      <set var="junitResultList" value="${it.JUnitTestResult}" />
+      <if test="${junitResultList.isEmpty()!=true}">
+        <div class="content">
+     <!--     <a href="${rooturl}${build.url}/testReport"> -->
+            <h1>JUnit Tests</h1>
+<!--          </a> -->
+          <table>
+            <tr>
+              <th class="border">Package</th>
+              <th class="border">Failed</th>
+              <th class="border">Passed</th>
+              <th class="border">Skipped</th>
+              <th class="border">Total</th>
+            </tr>
+            <forEach var="junitResult" items="${it.JUnitTestResult}">
+              <forEach var="packageResult" items="${junitResult.getChildren()}">
+                <tr>
+                  <td class="border">
+                    <tt>${packageResult.getName()}</tt>
+                  </td>
+                  <td class="border test_failed">${packageResult.getFailCount()}</td>
+                  <td class="border test_passed">${packageResult.getPassCount()}</td>
+                  <td class="border test_skipped">${packageResult.getSkipCount()}</td>
+                  <td class="border">
+                    <b>${packageResult.getPassCount()+packageResult.getFailCount()+packageResult.getSkipCount()}
+                    </b>
+                  </td>
+                </tr>
+                <forEach var="failed_test"
+                  items="${packageResult.getFailedTests()}">
+                  <tr>
+                    <td class="test_failed" colspan="5">
+                      <tt>${failed_test.getFullName()}</tt>
+                    </td>
+                  </tr>
+                </forEach>
+              </forEach>
+            </forEach>
+          </table>
+          <br />
+        </div>
+      </if>
+
+      <!-- COBERTURA TEMPLATE -->
+      <set var="coberturaAction" value="${it.coberturaAction}" />
+      <if test="${coberturaAction!=null}">
+        <div class="content">
+          <set var="coberturaResult" value="${coberturaAction.result}" />
+          <if test="${coberturaResult!=null}">
+            <a href="${rooturl}${build.url}/cobertura">
+              <h1>Cobertura Report</h1>
+            </a>
+            <h2>Project Coverage Summary</h2>
+            <table class="border">
+              <tr>
+                <th class="border">Name</th>
+                <forEach var="metric" items="${coberturaResult.metrics}">
+                  <th class="border">${metric.name}</th>
+                </forEach>
+              </tr>
+              <tr>
+                <td class="border">${coberturaResult.name}</td>
+                <forEach var="metric" items="${coberturaResult.metrics}">
+                  <td class="border"
+                    data="${coberturaResult.getCoverage(metric).percentageFloat}">${coberturaResult.getCoverage(metric).percentage}%
+                    (${coberturaResult.getCoverage(metric)})
+                  </td>
+                </forEach>
+              </tr>
+            </table>
+            <if test="${coberturaResult.sourceCodeLevel}">
+              <h2>Source</h2>
+              <choose>
+                <when test="${coberturaResult.sourceFileAvailable}">
+                  <div style="overflow-x:scroll;">
+                    <table class="source">
+                      <thead>
+                        <tr>
+                          <th colspan="3">${coberturaResult.relativeSourcePath}
+                          </th>
+                        </tr>
+                      </thead>
+                      ${coberturaResult.sourceFileContent}
+                    </table>
+                  </div>
+                </when>
+                <otherwise>
+                  <p>
+                    <i>Source code is unavailable</i>
+                  </p>
+                </otherwise>
+              </choose>
+            </if>
+            <forEach var="element" items="${coberturaResult.childElements}">
+              <set var="childMetrics"
+                value="${coberturaResult.getChildMetrics(element)}" />
+              <h2>Coverage Breakdown by ${element.displayName}</h2>
+              <table class="border">
+                <tr>
+                  <th class="border">Name</th>
+                  <forEach var="metric" items="${childMetrics}">
+                    <th class="border">${metric.name}</th>
+                  </forEach>
+                </tr>
+                <forEach var="c" items="${coberturaResult.children}">
+                  <set var="child" value="${coberturaResult.getChild(c)}" />
+                  <tr>
+                    <td class="border">
+                      ${child.xmlTransform(child.name)}
+                    </td>
+                    <forEach var="metric" items="${childMetrics}">
+                      <set var="childResult" value="${child.getCoverage(metric)}" />
+                      <choose>
+                        <when test="${childResult!=null}">
+                          <td class="border" data="${childResult.percentageFloat}">${childResult.percentage}%
+                            (${childResult})
+                          </td>
+                        </when>
+                        <otherwise>
+                          <td class="border" data="101">N/A</td>
+                        </otherwise>
+                      </choose>
+                    </forEach>
+                  </tr>
+                </forEach>
+              </table>
+            </forEach>
+          </if>
+          <br />
+        </div>
+      </if>
+
+      <!-- Static Analysis -->
+      <set var="actions" value="${it.staticAnalysisActions}" />
+      <if test="${!actions.isEmpty()}">
+        <div class="content">
+          <h1>Static Analysis Results</h1>
+          <table>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Result</th>
+              <th>Total</th>
+              <th>High</th>
+              <th>Normal</th>
+              <th>Low</th>
+            </tr>
+            <forEach var="action" items="${actions}">
+              <tr>
+                <td>
+                  <img src="${rooturl}${action.smallImageName}" />
+                </td>
+                <td>
+                  <a href="${rooturl}${build.url}/${action.urlName}">${action.displayName}</a>
+                </td>
+                <td class="center">
+                  <choose>
+                    <when test="${action.result.pluginResult=='SUCCESS'}">
+                      <img src="${rooturl}static/e59dfe28/images/16x16/blue.gif" />
+                    </when>
+                    <when test="${action.result.pluginResult=='FAILURE'}">
+                      <img src="${rooturl}static/e59dfe28/images/16x16/red.gif" />
+                    </when>
+                    <otherwise>
+                      <img src="${rooturl}static/e59dfe28/images/16x16/yellow.gif" />
+                    </otherwise>
+                  </choose>
+                </td>
+                <td class="center">${action.result.numberOfAnnotations} </td>
+                <td class="center">${action.result.getNumberOfAnnotations('HIGH')} </td>
+                <td class="center">${action.result.getNumberOfAnnotations('NORMAL')} </td>
+                <td class="center">${action.result.getNumberOfAnnotations('LOW')} </td>
+              </tr>
+            </forEach>
+          </table>
+        </div>
+      </if>
+ </body>
+  </html>
+

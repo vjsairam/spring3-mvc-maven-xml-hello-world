@@ -1,3 +1,5 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define">
   <html>
     <head>
       <title>${project.name}</title>
@@ -94,26 +96,26 @@
 <br />
         <!-- GENERAL INFO -->
       <div class="content">
-        <set var="spc" value="&amp;nbsp;&amp;nbsp;" />
+        <j:set var="spc" value="&amp;nbsp;&amp;nbsp;" />
 		 <h1>Build Summary</h1>
         <table>
           <tr class="gray">
             <td align="right">
-              <choose>
-                <when test="${build.result=='SUCCESS'}">
+              <j:choose>
+                <j:when test="${build.result=='SUCCESS'}">
                   <img src="${rooturl}static/e59dfe28/images/32x32/blue.gif" />
-                </when>
-                <when test="${build.result=='FAILURE'}">
+                </j:when>
+                <j:when test="${build.result=='FAILURE'}">
                   <img src="${rooturl}static/e59dfe28/images/32x32/red.gif" />
-                </when>
-                <when test="${build.result=='ABORTED'}">
+                </j:when>
+                <j:when test="${build.result=='ABORTED'}">
                   <img src="${rooturl}static/e59dfe28/images/32x32/grey.gif" />
-                </when>
-                <otherwise>
+                </j:when>
+                <j:otherwise>
                   <img
                     src="${rooturl}static/e59dfe28/images/32x32/yellow.gif" />
-                </otherwise>
-              </choose>
+                </j:otherwise>
+              </j:choose>
             </td>
             <td valign="center">
               <b style="font-size: 200%;">BUILD ${build.result}</b>
@@ -148,8 +150,8 @@
           <tr>
             <td>Build cause:</td>
             <td>
-              <forEach var="cause" items="${build.causes}">${cause.shortDescription}
-              </forEach>
+              <j:forEach var="cause" items="${build.causes}">${cause.shortDescription}
+              </j:forEach>
             </td>
           </tr>
           <tr>
@@ -159,10 +161,10 @@
           <tr>
             <td>Built on:</td>
             <td>
-              <choose>
-                <when test="${build.builtOnStr!=''}">${build.builtOnStr}</when>
-                <otherwise>master</otherwise>
-              </choose>
+              <j:choose>
+                <j:when test="${build.builtOnStr!=''}">${build.builtOnStr}</j:when>
+                <j:otherwise>master</j:otherwise>
+              </j:choose>
             </td>
           </tr>
         </table>
@@ -170,9 +172,9 @@
 
       <!-- HEALTH TEMPLATE -->
       <div class="content">
-        <set var="healthIconSize" value="16x16" />
-        <set var="healthReports" value="${project.buildHealthReports}" />
-        <if test="${healthReports!=null}">
+        <j:set var="healthIconSize" value="16x16" />
+        <j:set var="healthReports" value="${project.buildHealthReports}" />
+        <j:if test="${healthReports!=null}">
           <h1>Health Report</h1>
           <table>
             <tr>
@@ -180,7 +182,7 @@
               <th>Description</th>
               <th>Score</th>
             </tr>
-            <forEach var="healthReport" items="${healthReports}">
+            <j:forEach var="healthReport" items="${healthReports}">
               <tr>
                 <td>
                   <img
@@ -189,16 +191,16 @@
                 <td>${healthReport.description}</td>
                 <td>${healthReport.score}</td>
               </tr>
-            </forEach>
+            </j:forEach>
           </table>
           <br />
-        </if>
+        </j:if>
       </div>
 
       <!-- CHANGE SET -->
-        <set var="changeSet" value="${build.changeSet}" />
-        <if test="${changeSet!=null}">
-        <set var="hadChanges" value="false" />
+        <j:set var="changeSet" value="${build.changeSet}" />
+        <j:if test="${changeSet!=null}">
+        <j:set var="hadChanges" value="false" />
         <div class="content">
             <h1>Changes</h1>
         <table>
@@ -210,9 +212,9 @@
                <th class="border">Fileset</th>
                <th class="border">Action</th>
              </tr>
-            <forEach var="cs" items="${changeSet.logs}" varStatus="loop">
-            <set var="hadChanges" value="true" />
-            <forEach var="p" items="${cs.affectedFiles}">
+            <j:forEach var="cs" items="${changeSet.logs}" varStatus="loop">
+            <j:set var="hadChanges" value="true" />
+            <j:forEach var="p" items="${cs.affectedFiles}">
                 <tr>
                    <td class="border">${cs.commitId}</td>
                    <td class="border">${cs.author}</td>
@@ -221,57 +223,57 @@
                    <td class="border">${p.path}</td>
                    <td class="border">${p.editType.name}</td>
                 </tr>
-             </forEach>
-             </forEach>
+             </j:forEach>
+             </j:forEach>
         </table>
-          <if test="${!hadChanges}">
+          <j:if test="${!hadChanges}">
             <p>No Changes</p>
-          </if>
+          </j:if>
         </div>
-        </if>
+        </j:if>
       <!-- ARTIFACTS -->
-      <set var="artifacts" value="${build.artifacts}" />
-      <if test="${artifacts!=null and artifacts.size()&gt;0}">
+      <j:set var="artifacts" value="${build.artifacts}" />
+      <j:if test="${artifacts!=null and artifacts.size()&gt;0}">
         <div class="content">
           <h1>Build Artifacts</h1>
           <ul>
-            <forEach var="f" items="${artifacts}">
+            <j:forEach var="f" items="${artifacts}">
               <li>
               <!--  <a href="${rooturl}${build.url}artifact/${f}">${f}</a> -->
 			   <p>${f}</p>
               </li>
-            </forEach>
+            </j:forEach>
           </ul>
         </div>
-      </if>
+      </j:if>
 
       <!-- MAVEN ARTIFACTS -->
-      <set var="mbuilds" value="${build.moduleBuilds}" />
-      <if test="${mbuilds!=null}">
+      <j:set var="mbuilds" value="${build.moduleBuilds}" />
+      <j:if test="${mbuilds!=null}">
         <div class="content">
           <h1>Build Artifacts</h1>
-          <forEach var="m" items="${mbuilds}">
+          <j:forEach var="m" items="${mbuilds}">
             <p>${m.key.displayName}</p>
-            <forEach var="mvnbld" items="${m.value}">
-              <set var="artifacts" value="${mvnbld.artifacts}" />
-              <if test="${artifacts!=null and artifacts.size()&gt;0}">
+            <j:forEach var="mvnbld" items="${m.value}">
+              <j:set var="artifacts" value="${mvnbld.artifacts}" />
+              <j:if test="${artifacts!=null and artifacts.size()&gt;0}">
                <ul>
-                  <forEach var="f" items="${artifacts}">
+                  <j:forEach var="f" items="${artifacts}">
                    <!--   <a href="${rooturl}${mvnbld.url}artifact/${f}">${f}</a> -->
                 <li>
                 <p>${f}</p>
                 </li>
-                  </forEach>
+                  </j:forEach>
                </ul>
-              </if>
-            </forEach>
-          </forEach>
+              </j:if>
+            </j:forEach>
+          </j:forEach>
 <!--          <br /> -->
         </div>
-      </if>
+      </j:if>
       <!-- JUnit TEMPLATE -->
-      <set var="junitResultList" value="${it.JUnitTestResult}" />
-      <if test="${junitResultList.isEmpty()!=true}">
+      <j:set var="junitResultList" value="${it.JUnitTestResult}" />
+      <j:if test="${junitResultList.isEmpty()!=true}">
         <div class="content">
      <!--     <a href="${rooturl}${build.url}/testReport"> -->
             <h1>JUnit Tests</h1>
@@ -284,8 +286,8 @@
               <th class="border">Skipped</th>
               <th class="border">Total</th>
             </tr>
-            <forEach var="junitResult" items="${it.JUnitTestResult}">
-              <forEach var="packageResult" items="${junitResult.getChildren()}">
+            <j:forEach var="junitResult" items="${it.JUnitTestResult}">
+              <j:forEach var="packageResult" items="${junitResult.getChildren()}">
                 <tr>
                   <td class="border">
                     <tt>${packageResult.getName()}</tt>
@@ -298,27 +300,27 @@
                     </b>
                   </td>
                 </tr>
-                <forEach var="failed_test"
+                <j:forEach var="failed_test"
                   items="${packageResult.getFailedTests()}">
                   <tr>
                     <td class="test_failed" colspan="5">
                       <tt>${failed_test.getFullName()}</tt>
                     </td>
                   </tr>
-                </forEach>
-              </forEach>
-            </forEach>
+                </j:forEach>
+              </j:forEach>
+            </j:forEach>
           </table>
           <br />
         </div>
-      </if>
+      </j:if>
 
       <!-- COBERTURA TEMPLATE -->
-      <set var="coberturaAction" value="${it.coberturaAction}" />
-      <if test="${coberturaAction!=null}">
+      <j:set var="coberturaAction" value="${it.coberturaAction}" />
+      <j:if test="${coberturaAction!=null}">
         <div class="content">
-          <set var="coberturaResult" value="${coberturaAction.result}" />
-          <if test="${coberturaResult!=null}">
+          <j:set var="coberturaResult" value="${coberturaAction.result}" />
+          <j:if test="${coberturaResult!=null}">
             <a href="${rooturl}${build.url}/cobertura">
               <h1>Cobertura Report</h1>
             </a>
@@ -326,24 +328,24 @@
             <table class="border">
               <tr>
                 <th class="border">Name</th>
-                <forEach var="metric" items="${coberturaResult.metrics}">
+                <j:forEach var="metric" items="${coberturaResult.metrics}">
                   <th class="border">${metric.name}</th>
-                </forEach>
+                </j:forEach>
               </tr>
               <tr>
                 <td class="border">${coberturaResult.name}</td>
-                <forEach var="metric" items="${coberturaResult.metrics}">
+                <j:forEach var="metric" items="${coberturaResult.metrics}">
                   <td class="border"
                     data="${coberturaResult.getCoverage(metric).percentageFloat}">${coberturaResult.getCoverage(metric).percentage}%
                     (${coberturaResult.getCoverage(metric)})
                   </td>
-                </forEach>
+                </j:forEach>
               </tr>
             </table>
-            <if test="${coberturaResult.sourceCodeLevel}">
+            <j:if test="${coberturaResult.sourceCodeLevel}">
               <h2>Source</h2>
-              <choose>
-                <when test="${coberturaResult.sourceFileAvailable}">
+              <j:choose>
+                <j:when test="${coberturaResult.sourceFileAvailable}">
                   <div style="overflow-x:scroll;">
                     <table class="source">
                       <thead>
@@ -355,56 +357,56 @@
                       ${coberturaResult.sourceFileContent}
                     </table>
                   </div>
-                </when>
-                <otherwise>
+                </j:when>
+                <j:otherwise>
                   <p>
                     <i>Source code is unavailable</i>
                   </p>
-                </otherwise>
-              </choose>
-            </if>
-            <forEach var="element" items="${coberturaResult.childElements}">
-              <set var="childMetrics"
+                </j:otherwise>
+              </j:choose>
+            </j:if>
+            <j:forEach var="element" items="${coberturaResult.childElements}">
+              <j:set var="childMetrics"
                 value="${coberturaResult.getChildMetrics(element)}" />
               <h2>Coverage Breakdown by ${element.displayName}</h2>
               <table class="border">
                 <tr>
                   <th class="border">Name</th>
-                  <forEach var="metric" items="${childMetrics}">
+                  <j:forEach var="metric" items="${childMetrics}">
                     <th class="border">${metric.name}</th>
-                  </forEach>
+                  </j:forEach>
                 </tr>
-                <forEach var="c" items="${coberturaResult.children}">
-                  <set var="child" value="${coberturaResult.getChild(c)}" />
+                <j:forEach var="c" items="${coberturaResult.children}">
+                  <j:set var="child" value="${coberturaResult.getChild(c)}" />
                   <tr>
                     <td class="border">
                       ${child.xmlTransform(child.name)}
                     </td>
-                    <forEach var="metric" items="${childMetrics}">
-                      <set var="childResult" value="${child.getCoverage(metric)}" />
-                      <choose>
-                        <when test="${childResult!=null}">
+                    <j:forEach var="metric" items="${childMetrics}">
+                      <j:set var="childResult" value="${child.getCoverage(metric)}" />
+                      <j:choose>
+                        <j:when test="${childResult!=null}">
                           <td class="border" data="${childResult.percentageFloat}">${childResult.percentage}%
                             (${childResult})
                           </td>
-                        </when>
-                        <otherwise>
+                        </j:when>
+                        <j:otherwise>
                           <td class="border" data="101">N/A</td>
-                        </otherwise>
-                      </choose>
-                    </forEach>
+                        </j:otherwise>
+                      </j:choose>
+                    </j:forEach>
                   </tr>
-                </forEach>
+                </j:forEach>
               </table>
-            </forEach>
-          </if>
+            </j:forEach>
+          </j:if>
           <br />
         </div>
-      </if>
+      </j:if>
 
       <!-- Static Analysis -->
-      <set var="actions" value="${it.staticAnalysisActions}" />
-      <if test="${!actions.isEmpty()}">
+      <j:set var="actions" value="${it.staticAnalysisActions}" />
+      <j:if test="${!actions.isEmpty()}">
         <div class="content">
           <h1>Static Analysis Results</h1>
           <table>
@@ -417,7 +419,7 @@
               <th>Normal</th>
               <th>Low</th>
             </tr>
-            <forEach var="action" items="${actions}">
+            <j:forEach var="action" items="${actions}">
               <tr>
                 <td>
                   <img src="${rooturl}${action.smallImageName}" />
@@ -426,27 +428,27 @@
                   <a href="${rooturl}${build.url}/${action.urlName}">${action.displayName}</a>
                 </td>
                 <td class="center">
-                  <choose>
-                    <when test="${action.result.pluginResult=='SUCCESS'}">
+                  <j:choose>
+                    <j:when test="${action.result.pluginResult=='SUCCESS'}">
                       <img src="${rooturl}static/e59dfe28/images/16x16/blue.gif" />
-                    </when>
-                    <when test="${action.result.pluginResult=='FAILURE'}">
+                    </j:when>
+                    <j:when test="${action.result.pluginResult=='FAILURE'}">
                       <img src="${rooturl}static/e59dfe28/images/16x16/red.gif" />
-                    </when>
-                    <otherwise>
+                    </j:when>
+                    <j:otherwise>
                       <img src="${rooturl}static/e59dfe28/images/16x16/yellow.gif" />
-                    </otherwise>
-                  </choose>
+                    </j:otherwise>
+                  </j:choose>
                 </td>
                 <td class="center">${action.result.numberOfAnnotations} </td>
                 <td class="center">${action.result.getNumberOfAnnotations('HIGH')} </td>
                 <td class="center">${action.result.getNumberOfAnnotations('NORMAL')} </td>
                 <td class="center">${action.result.getNumberOfAnnotations('LOW')} </td>
               </tr>
-            </forEach>
+            </j:forEach>
           </table>
         </div>
-      </if>
+      </j:if>
  </body>
   </html>
-
+</j:jelly>
